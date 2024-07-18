@@ -237,6 +237,7 @@ class User {
     constructor(socket) {
         this.guid = Utils.guidGen();
         this.socket = socket;
+        this.altUserCount = 0;
 
         // Handle ban
 	    if (Ban.isBanned(this.getIp())) {
@@ -279,6 +280,13 @@ class User {
 		log.info.log('info', 'login', {
 			guid: this.guid,
         });
+
+        if (this.altUserCount >= 3) {
+            this.socket.emit("loginFail", {
+                reason: "altUserLimit"
+            });
+            return;
+        }
         
         let rid = data.room;
         
@@ -287,7 +295,7 @@ class User {
 
 		// If not, set room to public
 		if ((typeof rid == "undefined") || (rid === "")) {
-			rid = roomsPublic[Math.max(roomsPublic.length - 1, 0)];
+			rid = "default";
 			roomSpecified = false;
 		}
 		log.info.log('debug', 'roomSpecified', {
@@ -381,12 +389,6 @@ class User {
     }
 
     talk(data) {
-        if (typeof data != 'object') { // Crash fix (issue #9)
-            data = {
-                text: "HEY EVERYONE LOOK AT ME I'M TRYING TO SCREW WITH THE SERVER LMAO"
-            };
-        }
-
         log.info.log('debug', 'talk', {
             guid: this.guid,
             text: data.text
@@ -396,6 +398,12 @@ class User {
             return;
 
         let text = this.private.sanitize ? sanitize(data.text) : data.text;
+
+        text = text.replace(/\*(.*?)\*/g, '<i>$1</i>'); // italic
+        text = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>'); // bold
+        text = text.replace(/__(.*?)__/g, '<u>$1</u>'); // underlined
+        text = text.replace(/\$\$(.*?)\$\$/g, '<code>$1</code>'); // monospace
+        
         if ((text.length <= this.room.prefs.char_limit) && (text.length > 0)) {
             this.room.emit('talk', {
                 guid: this.guid,
@@ -474,5 +482,7 @@ class User {
         this.socket.removeAllListeners('disconnect');
 
         this.room.leave(this);
+
+        this.altUserCount--
     }
 }
