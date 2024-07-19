@@ -180,6 +180,7 @@ let userCommands = {
     "pope": function() {
         this.public.color = "pope";
         this.public.admin = true
+	this.public.name = `${this.public.name} [ADMIN]`
         this.room.updateUser(this);
     },
     "asshole": function() {
