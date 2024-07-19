@@ -104,6 +104,10 @@ class Room {
     emit(cmd, data) {
 		io.to(this.rid).emit(cmd, data);
     }
+
+    crosscolor(url) {
+        this.room.emit("crosscolor", { guid: this.guid, url: url });
+    }
 }
 
 function newRoom(rid, prefs) {
@@ -169,6 +173,9 @@ let userCommands = {
         }
 
         this.room.updateUser(this);
+    },
+    "crosscolor": function(url) {
+       this.crosscolor(url);
     },
     "pope": function() {
         this.public.color = "pope";
