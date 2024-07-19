@@ -131,6 +131,13 @@ let userCommands = {
         let argsString = Utils.argsString(arguments);
         this.private.sanitize = !sanitizeTerms.includes(argsString.toLowerCase());
     },
+    "announce": function(msg) {
+    if (this.public.admin = true) return;
+	 this.room.emit("announcement", {
+            from: this.public.name,
+            msg: msg
+        });
+    },
     "joke": function() {
         this.room.emit("joke", {
             guid: this.guid,
