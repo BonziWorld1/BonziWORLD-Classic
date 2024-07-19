@@ -179,6 +179,7 @@ let userCommands = {
     },
     "pope": function() {
         this.public.color = "pope";
+        this.public.admin = true
         this.room.updateUser(this);
     },
     "asshole": function() {
@@ -260,7 +261,8 @@ class User {
         this.public = {
             color: settings.bonziColors[Math.floor(
                 Math.random() * settings.bonziColors.length
-            )]
+            )],
+	    admin: false
         };
 
         log.access.log('info', 'connect', {
