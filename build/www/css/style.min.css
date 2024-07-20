@@ -581,3 +581,119 @@
 
   .context-menu-accesskey {
     text-decoration: underline; }
+
+  #log_cont,
+.msWindow_cont {
+    position: absolute;
+    box-sizing: border-box;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 28px, rgba(0, 0, 0, 0.25) 31px, rgba(0, 0, 0, 0) 31px), linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0) 5px), linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.1) 31px), linear-gradient(180deg, rgba(0, 0, 0, 0) 0px, rgba(255, 255, 255, 0.05) 31px, rgba(0, 0, 0, 0) 31.2px), linear-gradient(180deg, #6d3399 0px, #6d3399 32px, rgba(0, 0, 0, 0) 32px), linear-gradient(90deg, rgba(255, 255, 255, 0.2) 0px, rgba(0, 0, 0, 0) 4px), linear-gradient(0deg, rgba(255, 255, 255, 0.2) 0px, rgba(0, 0, 0, 0) 4px), linear-gradient(270deg, rgba(255, 255, 255, 0.2) 0px, rgba(0, 0, 0, 0) 4px), #6d3399;
+    border: 1px solid #582a7a;
+    padding: 0px 5px 5px 5px;
+    border-top-right-radius: 6px;
+    z-index: 1;
+}
+
+#log_cont {
+    top: 0;
+    left: 0;
+    width: 350px;
+    max-width: calc(100% - 200px);
+    height: calc(100% - 32px);
+}
+
+.msWindow_cont {
+    z-index: 20;
+    border-top-left-radius: 6px;
+}
+
+.msWindow_cont p {
+    user-select: none;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+#log_title,
+.msWindow_title {
+    margin: 6px 0px 6px 4px;
+    color: white;
+    font-size: 16px;
+    text-shadow: 1.5px 1.5px rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
+}
+
+#log_body,
+.msWindow_body {
+    background-color: #F5F5F5;
+    box-sizing: border-box;
+    padding: 0px 5px 10px 5px;
+    width: 100%;
+    height: calc(100% - 29px);
+    margin: 0;
+    overflow-y: scroll;
+    word-break: break-word;
+}
+
+.msWindow_body {
+    padding: 10px 15px;
+}
+
+.side img {
+    width: 40px;
+    height: 40px;
+}
+
+.buttonbar {
+    margin-top: 7px;
+}
+
+.msBtn {
+    clear: left;
+    font-size: 13px;
+    padding: 2px 15px;
+    background-color: #F5F5F5;
+    border: 2px outset #F5F5F5;
+    outline: 1px solid rgba(0, 0, 0, 0.7);
+    border-radius: 0px;
+}
+
+.msBtn:active {
+    border-style: inset;
+}
+
+#log_body::-webkit-scrollbar,
+.msWindow_body::-webkit-scrollbar {
+    display: none;
+}
+
+#log_body p {
+    margin: 0;
+    padding: 7px 0px 0px 0px;
+}
+
+.log_close {
+    position: relative;
+    border: none;
+    background-image: url("https://bonziworld.org/img/assets/xpbutton.webp");
+    background-size: 100%;
+    width: 22px;
+    height: 22px;
+    font-size: 19px;
+    top: -2px;
+    padding: 0;
+    color: white;
+    border-radius: 3px;
+    float: right;
+    margin-left: 5px;
+}
+
+.log_close:hover {
+    background-position: 100%;
+}
+
+.log_close i {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
