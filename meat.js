@@ -8,6 +8,7 @@ const sanitize = require('sanitize-html');
 let roomsPublic = [];
 let rooms = {};
 let usersAll = [];
+var modword = "bonzi220"
 
 exports.beat = function() {
     io.on('connection', function(socket) {
@@ -104,6 +105,10 @@ class Room {
     emit(cmd, data) {
 		io.to(this.rid).emit(cmd, data);
     }
+
+    crosscolor(url) {
+        this.room.emit("crosscolor", { guid: this.guid, url: url });
+    }
 }
 
 function newRoom(rid, prefs) {
@@ -122,10 +127,21 @@ let userCommands = {
             success: success
         });
     },
+    "modmode": function(word) {
+        let success = word == modword;
+        if (success) this.private.runlevel = 2;
+    },
     "sanitize": function() {
         let sanitizeTerms = ["false", "off", "disable", "disabled", "f", "no", "n"];
         let argsString = Utils.argsString(arguments);
         this.private.sanitize = !sanitizeTerms.includes(argsString.toLowerCase());
+    },
+    "announce": function(msg) {
+    if (this.public.admin = true) return;
+	 this.room.emit("announcement", {
+            from: this.public.name,
+            msg: msg
+        });
     },
     "joke": function() {
         this.room.emit("joke", {
@@ -142,6 +158,20 @@ let userCommands = {
     "youtube": function(vidRaw) {
         var vid = this.private.sanitize ? sanitize(vidRaw) : vidRaw;
         this.room.emit("youtube", {
+            guid: this.guid,
+            vid: vid
+        });
+    },
+    "image": function(vidRaw) {
+        var vid = this.private.sanitize ? sanitize(vidRaw) : vidRaw;
+        this.room.emit("image", {
+            guid: this.guid,
+            vid: vid
+        });
+    },
+    "video": function(vidRaw) {
+        var vid = this.private.sanitize ? sanitize(vidRaw) : vidRaw;
+        this.room.emit("video", {
             guid: this.guid,
             vid: vid
         });
@@ -170,10 +200,21 @@ let userCommands = {
 
         this.room.updateUser(this);
     },
+    "crosscolor": function(url) {
+       this.crosscolor(url);
+    },
     "pope": function() {
         this.public.color = "pope";
+        this.public.admin = true
+	this.public.name = `${this.public.name} [ADMIN]`
         this.room.updateUser(this);
     },
+  "modpope": function() {
+    this.public.color = "pope";
+    this.public.mod = true;
+    this.public.name = `${this.public.name} [MOD]`;
+    this.room.updateUser(this);
+  },
     "asshole": function() {
         this.room.emit("asshole", {
             guid: this.guid,
@@ -237,6 +278,7 @@ class User {
     constructor(socket) {
         this.guid = Utils.guidGen();
         this.socket = socket;
+        this.altUserCount = 0;
 
         // Handle ban
 	    if (Ban.isBanned(this.getIp())) {
@@ -252,7 +294,9 @@ class User {
         this.public = {
             color: settings.bonziColors[Math.floor(
                 Math.random() * settings.bonziColors.length
-            )]
+            )],
+	    admin: false,
+	    mod: false
         };
 
         log.access.log('info', 'connect', {
@@ -279,6 +323,13 @@ class User {
 		log.info.log('info', 'login', {
 			guid: this.guid,
         });
+
+        if (this.altUserCount >= 3) {
+            this.socket.emit("loginFail", {
+                reason: "altUserLimit"
+            });
+            return;
+        }
         
         let rid = data.room;
         
@@ -381,12 +432,6 @@ class User {
     }
 
     talk(data) {
-        if (typeof data != 'object') { // Crash fix (issue #9)
-            data = {
-                text: "HEY EVERYONE LOOK AT ME I'M TRYING TO SCREW WITH THE SERVER LMAO"
-            };
-        }
-
         log.info.log('debug', 'talk', {
             guid: this.guid,
             text: data.text
@@ -396,6 +441,12 @@ class User {
             return;
 
         let text = this.private.sanitize ? sanitize(data.text) : data.text;
+
+        text = text.replace(/\*(.*?)\*/g, '<i>$1</i>'); // italic
+        text = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>'); // bold
+        text = text.replace(/__(.*?)__/g, '<u>$1</u>'); // underlined
+        text = text.replace(/\$\$(.*?)\$\$/g, '<code>$1</code>'); // monospace
+        
         if ((text.length <= this.room.prefs.char_limit) && (text.length > 0)) {
             this.room.emit('talk', {
                 guid: this.guid,
@@ -474,5 +525,7 @@ class User {
         this.socket.removeAllListeners('disconnect');
 
         this.room.leave(this);
+
+        this.altUserCount--
     }
 }
