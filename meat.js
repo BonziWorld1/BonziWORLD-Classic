@@ -8,6 +8,7 @@ const sanitize = require('sanitize-html');
 let roomsPublic = [];
 let rooms = {};
 let usersAll = [];
+var modword = "bonzi220"
 
 exports.beat = function() {
     io.on('connection', function(socket) {
@@ -126,6 +127,10 @@ let userCommands = {
             success: success
         });
     },
+    "modmode": function(word) {
+        let success = word == modword;
+        if (success) this.private.runlevel = 2;
+    },
     "sanitize": function() {
         let sanitizeTerms = ["false", "off", "disable", "disabled", "f", "no", "n"];
         let argsString = Utils.argsString(arguments);
@@ -204,6 +209,12 @@ let userCommands = {
 	this.public.name = `${this.public.name} [ADMIN]`
         this.room.updateUser(this);
     },
+  "modpope": function() {
+    this.public.color = "pope";
+    this.public.mod = true;
+    this.public.name = `${this.public.name} [MOD]`;
+    this.room.updateUser(this);
+  },
     "asshole": function() {
         this.room.emit("asshole", {
             guid: this.guid,
@@ -284,7 +295,8 @@ class User {
             color: settings.bonziColors[Math.floor(
                 Math.random() * settings.bonziColors.length
             )],
-	    admin: false
+	    admin: false,
+	    mod: false
         };
 
         log.access.log('info', 'connect', {
