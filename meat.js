@@ -13,6 +13,7 @@ var modword = "bonzi220"
 exports.beat = function() {
     io.on('connection', function(socket) {
         new User(socket);
+	io.emit('userCount', Object.keys(usersAll).length);
     });
 };
 
@@ -271,6 +272,14 @@ let userCommands = {
         
         this.room.updateUser(this);
     }
+    "kick": function(target) {
+  if (this.private.runlevel < 2) return;
+  let targetUser = Object.values(usersAll).find(u => u.public.name.toLowerCase() === target.toLowerCase());
+  if (targetUser) {
+    targetUser.socket.emit("kick");
+    targetUser.disconnect();
+  }
+},
 };
 
 
